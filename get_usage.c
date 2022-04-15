@@ -42,7 +42,7 @@ typedef struct SYS_USAGE_NETLINK_DATA_S
 	};
 	uint32_t ret;
 	unsigned char buffer[0];
-}SYS_USAGE_NETLINK_DATA_S;
+} SYS_USAGE_NETLINK_DATA_S;
 
 typedef struct SYS_USAGE_CPU_NETLINK_STRUCT
 {
@@ -63,7 +63,7 @@ typedef struct SYS_USAGE_CPU_NETLINK_STRUCT
 	};
 	uint32_t ret;
 	unsigned char buffer[0];
-}SYS_USAGE_CPU_NETLINK_S;
+} SYS_USAGE_CPU_NETLINK_S;
 
 
 typedef struct cpu_usagetime_t

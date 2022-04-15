@@ -11,7 +11,7 @@ $ make
 $ sudo insmod sysmod
 
 # 测试获取 CPU 利用率
-$ ./test
+$ ./get_usage
 
 # 卸载模块
 $ sudo rmmod sysmod

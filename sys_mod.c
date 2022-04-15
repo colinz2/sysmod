@@ -32,18 +32,18 @@ static void sys_mod_recv_msg(struct sk_buff *skb)
 		return;
 	}
 
-	switch(type) {
+	switch (type) {
 		case SYS_USAGE_NTLK_CPU1:
 			sys_dealwith_cpu_usage_msg(nlsk, nlh);
 			break;
 		default:
-			printk( KERN_WARNING "uware_netlink_rcv rcv invalid type:%d\r\n", type);
+			printk( KERN_WARNING "netlink_rcv rcv invalid type:%d\r\n", type);
 			err = -1;
 		break;
 	}
 
 	if (err != 0 ) {
-		printk( KERN_WARNING " uware_netlink_rcv return :%d \r\n", err);
+		printk( KERN_WARNING "netlink_rcv return :%d \r\n", err);
 		return;
 	}
 }

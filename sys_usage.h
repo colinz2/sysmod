@@ -57,4 +57,4 @@ typedef struct SYS_USAGE_CPU_NETLINK_STRUCT
 
 int sys_usage_timer_init(void);
 void sys_usage_timer_deinit(void);
-void sys_dealwith_cpu_usage_msg(struct sock *uware_nlsk, struct nlmsghdr *nlh);
+void sys_dealwith_cpu_usage_msg(struct sock *nlsk, struct nlmsghdr *nlh);

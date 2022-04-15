@@ -6,8 +6,10 @@ all: module app
 
 module:
 	make -C $(KBUILD_DIR) M=$(shell pwd)
+
 app:
-	gcc -o test test.c
+	gcc -o get_usage get_usage.c
+
 clean:
 	make -C $(KBUILD_DIR) M=$(shell pwd) clean
 

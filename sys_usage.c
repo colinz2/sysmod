@@ -301,7 +301,7 @@ static int _cpu_usage_sendmsg2user(struct sock *ntsk, int pid, stat_cputime_t *c
 		printk( KERN_WARNING "send message to user error:%d \r\n", err);
 		return err;
 	}
-	//printk( KERN_WARNING "uware send message to user :%d [%d] \r\n", pid, err); 
+	//printk( KERN_WARNING "send message to user :%d [%d] \r\n", pid, err); 
 	return 0;
 }
 
@@ -332,7 +332,7 @@ void sys_dealwith_cpu_usage_msg(struct sock *nlsk, struct nlmsghdr *nlh)
 
 	type = nlh->nlmsg_type;
 	if (type != SYS_USAGE_NTLK_CPU1) {
-		printk(KERN_WARNING "uware_dealwith_cpu_usage_msg:%d\r\n", type);
+		printk(KERN_WARNING "sys_dealwith_cpu_usage_msg:%d\r\n", type);
 		return;
 	}
 
