@@ -1,5 +1,5 @@
-obj-m           := sysmod.o
-sysmod-objs :=  sys_mod.o sys_usage.o
+obj-m           := sysmod2.o
+sysmod2-objs :=  sys_mod.o sys_usage.o
 KBUILD_DIR      := /lib/modules/$(shell uname -r)/build
 
 all: module app

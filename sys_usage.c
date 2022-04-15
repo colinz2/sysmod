@@ -1,10 +1,11 @@
 #include <linux/timer.h>
 #include <linux/string.h>
-#include <linux/fs.h>
 #include <linux/uaccess.h>
+#include <linux/fs.h>
 #include <linux/slab.h>
 #include <net/netlink.h>
 #include <linux/module.h>
+
 #include "sys_usage.h"
 
 
@@ -156,7 +157,6 @@ static uint32_t
 read_cpu_stat(stat_cputime_t *cpu) 
 {
 	struct file *fp;
-	mm_segment_t fs;
 	loff_t pos = 0;
 	char line[256] = {0};
 	fp = filp_open("/proc/stat", O_RDONLY, 0);
@@ -165,12 +165,8 @@ read_cpu_stat(stat_cputime_t *cpu)
 		return -1;
 	} 
 
-	fs =get_fs();
-	set_fs(KERNEL_DS);
-
-	vfs_read(fp, line, sizeof(line), &pos);
+	kernel_read(fp, line, sizeof(line), &pos);
 	filp_close(fp, NULL);
-	set_fs(fs);
 
 	if (sscanf(line, "cpu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
 		&cpu->user,
@@ -216,7 +212,6 @@ cpu_usge_analyse(struct cputime_rb *rb, stat_cputime_t *cur)
 	stat_cputime_t bf;
 	char buf[256] = {0};
 	struct file *fp;
-	mm_segment_t fs;
 	loff_t pos = 0;
 	int len = 0;
 
@@ -225,36 +220,33 @@ cpu_usge_analyse(struct cputime_rb *rb, stat_cputime_t *cur)
 		printk("create file /tmp/cpu_usage_0 error/n");
 		return -1;
 	}
-	fs =get_fs();
-	set_fs(KERNEL_DS);
 
 	if (!cputime_rb_read(rb, 5, &bf)) {
 		cal_cpu_usage_result(&bf, cur, buf, 5);  
 		len = strlen(buf);
 		pos += len;
-		vfs_write(fp, buf, len, &pos);
+		kernel_write(fp, buf, len, &pos);
 	}
 
 	if (!cputime_rb_read(rb, 60, &bf)) {
 		cal_cpu_usage_result(&bf, cur, buf, 60); 
 		len = strlen(buf);
 		pos += len;
-		vfs_write(fp, buf, len, &pos);
+		kernel_write(fp, buf, len, &pos);
 	}
 
 	if (!cputime_rb_read(rb, 300, &bf)) {
 		cal_cpu_usage_result(&bf, cur, buf, 300); 
 		len = strlen(buf);
 		pos += len;
-		vfs_write(fp, buf, len, &pos);
+		kernel_write(fp, buf, len, &pos);
 	}
 
 	filp_close(fp, NULL);
-	set_fs(fs);
 	return 0;
 }
 
-static void sys_usage_timer_handle(unsigned long arg)
+static void sys_usage_timer_handle(struct timer_list * tl)
 {
 	stat_cputime_t curr;
 	int ret;
@@ -316,7 +308,6 @@ static int _cpu_usage_sendmsg2user(struct sock *ntsk, int pid, stat_cputime_t *c
 
 int sys_usage_timer_init(void)
 {
-	init_timer(&s_timer);
 	s_timer.function = &sys_usage_timer_handle;
 	s_timer.expires = jiffies + HZ;
 	add_timer(&s_timer);
@@ -331,10 +322,10 @@ void sys_usage_timer_deinit(void)
 }
 
 
-void sys_dealwith_cpu_usage_msg(struct sock *uware_nlsk, struct nlmsghdr *nlh)
+void sys_dealwith_cpu_usage_msg(struct sock *nlsk, struct nlmsghdr *nlh)
 {
 	int pid, type, err;
-	SYS_USAGE_CPU_NETLINK_S *pstPRData = nlh;
+	SYS_USAGE_CPU_NETLINK_S *pstPRData = (SYS_USAGE_CPU_NETLINK_S*)nlh;
 	stat_cputime_t stat_cputime_tmp;
 	int timeago;
 	int ret;
@@ -362,7 +353,7 @@ void sys_dealwith_cpu_usage_msg(struct sock *uware_nlsk, struct nlmsghdr *nlh)
 		break;
 	}
 
-	_cpu_usage_sendmsg2user(uware_nlsk, pid, &stat_cputime_tmp, ret);
+	_cpu_usage_sendmsg2user(nlsk, pid, &stat_cputime_tmp, ret);
 	return;
 }
 
